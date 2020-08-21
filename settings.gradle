@@ -1,0 +1,2 @@
+rootProject.name='SyncLocalAndRemoteDB'
+include ':app'
