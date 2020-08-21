@@ -90,7 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public long createCharacter(Character character){
         try (SQLiteDatabase sqLiteDatabase = getWritableDatabase()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_ID, character.getId());
+//            values.put(KEY_ID, character.getId());
             values.put(KEY_NAME, character.getName());
             values.put(CHARACTER_KEY_STRENGTH, character.getStrength());
             values.put(CHARACTER_KEY_DEXTERITY, character.getDexterity());
