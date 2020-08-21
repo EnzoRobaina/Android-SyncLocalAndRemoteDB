@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">SyncLocalAndRemoteDB</string>
+    <string name="char_name">Name</string>
+    <string name="char_strength">Strength</string>
+    <string name="char_dex">Dexterity</string>
+    <string name="char_const">Constitution</string>
+    <string name="char_intel">Intelligence</string>
+    <string name="char_wisdom">Wisdom</string>
+    <string name="char_charisma">Charisma</string>
 </resources>
