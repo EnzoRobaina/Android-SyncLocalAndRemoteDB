@@ -1,5 +1,7 @@
 package com.enzorobaina.synclocalandremotedb.model;
 
+import java.util.Locale;
+
 public class Character {
     /*
         "id": 1,
@@ -101,5 +103,20 @@ public class Character {
 
     public void setCharisma(int charisma) {
         this.charisma = charisma;
+    }
+
+    public String toString(){
+        return String.format(
+                Locale.ENGLISH,
+                "ID: %d, Name: %s, St: %d, Dex: %d, Const: %d, Intel: %d, Wisd: %d, Char: %d",
+                this.id,
+                this.name,
+                this.strength,
+                this.dexterity,
+                this.constitution,
+                this.intelligence,
+                this.wisdom,
+                this.charisma
+        );
     }
 }
