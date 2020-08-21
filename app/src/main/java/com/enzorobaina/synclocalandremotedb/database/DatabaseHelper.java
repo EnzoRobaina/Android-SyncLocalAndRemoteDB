@@ -1,8 +1,12 @@
 package com.enzorobaina.synclocalandremotedb.database;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.enzorobaina.synclocalandremotedb.model.Character;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
@@ -49,7 +53,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String.format(
                         "CREATE TABLE %s (%s INTEGER PRIMARY KEY, %s TEXT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER)",
                         CHARACTER_TABLE_NAME,
-                        KEY_ID, KEY_NAME,
+                        KEY_ID,
+                        KEY_NAME,
                         CHARACTER_KEY_STRENGTH,
                         CHARACTER_KEY_DEXTERITY,
                         CHARACTER_KEY_CONSTITUTION,
@@ -80,5 +85,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void dropTable(String tableName){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         sqLiteDatabase.execSQL(SQL_DROP_TABLE + tableName);
+    }
+
+    public long createCharacter(Character character){
+        try (SQLiteDatabase sqLiteDatabase = getWritableDatabase()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_ID, character.getId());
+            values.put(KEY_NAME, character.getName());
+            values.put(CHARACTER_KEY_STRENGTH, character.getStrength());
+            values.put(CHARACTER_KEY_DEXTERITY, character.getDexterity());
+            values.put(CHARACTER_KEY_CONSTITUTION, character.getConstitution());
+            values.put(CHARACTER_KEY_INTELLIGENCE, character.getIntelligence());
+            values.put(CHARACTER_KEY_WISDOM, character.getWisdom());
+            values.put(CHARACTER_KEY_CHARISMA, character.getCharisma());
+            return sqLiteDatabase.insert(CHARACTER_TABLE_NAME,null, values);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public Character getCharacter(int id) {
+        Character character = null;
+        try (
+                SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+                Cursor cursor = sqLiteDatabase.rawQuery(
+                        "SELECT * FROM " + CHARACTER_TABLE_NAME + " WHERE " + KEY_ID + " =? " + "LIMIT 1",
+                        new String[]{String.valueOf(id)}
+                )
+        ) {
+            if (cursor != null) {
+                cursor.moveToFirst();
+                character = new Character(
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getInt(2),
+                        cursor.getInt(3),
+                        cursor.getInt(4),
+                        cursor.getInt(5),
+                        cursor.getInt(6),
+                        cursor.getInt(7)
+                );
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return character;
     }
 }
