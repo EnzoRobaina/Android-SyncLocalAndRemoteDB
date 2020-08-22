@@ -1,15 +1,12 @@
 package com.enzorobaina.synclocalandremotedb.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.IntentService;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
@@ -62,8 +59,15 @@ public class CreateCharacterActivity extends AppCompatActivity {
         character.setWisdom(_i(wisdomEditText));
         character.setCharisma(_i(charismaEditText));
 
-        long charIdOnDatabase = databaseHelper.createCharacter(character);
-        Toast.makeText(this, String.valueOf(charIdOnDatabase), Toast.LENGTH_LONG).show();
-        Log.d("char", databaseHelper.getCharacter((int) charIdOnDatabase).toString());
+        if (databaseHelper.createCharacter(character) > 0){
+            this._startListActivity();
+        }
+        else {
+            Toast.makeText(this, "Ocorreu um erro.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void _startListActivity(){
+        startActivity(new Intent(this, ListCharacterActivity.class));
     }
 }
