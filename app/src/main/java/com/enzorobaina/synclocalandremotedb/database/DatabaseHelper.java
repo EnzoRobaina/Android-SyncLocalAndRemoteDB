@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
 
@@ -128,9 +131,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getInt(7)
                 );
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return character;
+    }
+
+    public List<Character> getAllCharacters(){
+        List<Character> characters = new ArrayList<>();
+        try (
+                SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+                Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + CHARACTER_TABLE_NAME, null)
+        ) {
+            if (cursor.moveToFirst()) {
+                do {
+                    characters.add(
+                        new Character(
+                            cursor.getInt(0),
+                            cursor.getString(1),
+                            cursor.getInt(2),
+                            cursor.getInt(3),
+                            cursor.getInt(4),
+                            cursor.getInt(5),
+                            cursor.getInt(6),
+                            cursor.getInt(7)
+                        )
+                    );
+                }
+                while (cursor.moveToNext());
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return characters;
     }
 }
