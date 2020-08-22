@@ -15,7 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
 
     public static final String DB_NAME = "synclocalandremotedb";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
 
@@ -28,16 +28,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CHARACTER_KEY_CHARISMA = "charisma";
 
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
-    /*
-        "id": 1,
-        "name": "Foo",
-        "strength": 1,
-        "dexterity": 3,
-        "constitution": 2,
-        "intelligence": 4,
-        "wisdom": 2,
-        "charisma": 3,
-    */
 
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (sInstance == null){
@@ -70,13 +60,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        this.dropTable(CHARACTER_TABLE_NAME);
+        this.dropTable(CHARACTER_TABLE_NAME, sqLiteDatabase);
         this.onCreate(sqLiteDatabase);
     }
 
     @Override
     public void onDowngrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        this.dropTable(CHARACTER_TABLE_NAME);
+        this.dropTable(CHARACTER_TABLE_NAME, sqLiteDatabase);
         this.onCreate(sqLiteDatabase);
     }
 
@@ -90,10 +80,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_DROP_TABLE + tableName);
     }
 
+    private void dropTable(String tableName, SQLiteDatabase sqLiteDatabase){
+        sqLiteDatabase.execSQL(SQL_DROP_TABLE + tableName);
+    }
+
     public long createCharacter(Character character){
         try (SQLiteDatabase sqLiteDatabase = getWritableDatabase()) {
             ContentValues values = new ContentValues();
-//            values.put(KEY_ID, character.getId());
+            if (character.getId() != 0){
+                values.put(KEY_ID, character.getId());
+            }
             values.put(KEY_NAME, character.getName());
             values.put(CHARACTER_KEY_STRENGTH, character.getStrength());
             values.put(CHARACTER_KEY_DEXTERITY, character.getDexterity());
@@ -115,7 +111,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 SQLiteDatabase sqLiteDatabase = getReadableDatabase();
                 Cursor cursor = sqLiteDatabase.rawQuery(
                         "SELECT * FROM " + CHARACTER_TABLE_NAME + " WHERE " + KEY_ID + " =? " + "LIMIT 1",
-                        new String[]{String.valueOf(id)}
+                        new String[]{ String.valueOf(id) }
                 )
         ) {
             if (cursor != null) {
