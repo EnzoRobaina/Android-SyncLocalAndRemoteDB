@@ -1,13 +1,10 @@
 package com.enzorobaina.synclocalandremotedb.api;
 
 import android.content.Context;
-
 import com.enzorobaina.synclocalandremotedb.api.service.CharacterService;
 import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
-
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,6 +33,9 @@ public class Syncer {
     public void runFirst(VoidCallback voidCallback){
         if (databaseHelper.isCharacterDatabaseEmpty()){
             this.syncLocalWithRemote(voidCallback);
+        }
+        else {
+            voidCallback.onSuccess();
         }
     }
 
