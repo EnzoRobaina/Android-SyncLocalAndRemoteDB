@@ -3,16 +3,6 @@ package com.enzorobaina.synclocalandremotedb.model;
 import java.util.Locale;
 
 public class Character {
-    /*
-        "id": 1,
-        "name": "Foo",
-        "strength": 1,
-        "dexterity": 3,
-        "constitution": 2,
-        "intelligence": 4,
-        "wisdom": 2,
-        "charisma": 3,
-    */
     private int id;
     private String name;
     private int strength;
@@ -21,6 +11,7 @@ public class Character {
     private int intelligence;
     private int wisdom;
     private int charisma;
+    private boolean isSynced;
 
     public Character(int id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma) {
         this.id = id;
@@ -31,6 +22,7 @@ public class Character {
         this.intelligence = intelligence;
         this.wisdom = wisdom;
         this.charisma = charisma;
+        this.isSynced = false;
     }
 
     public Character(String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma) {
@@ -41,6 +33,53 @@ public class Character {
         this.intelligence = intelligence;
         this.wisdom = wisdom;
         this.charisma = charisma;
+        this.isSynced = false;
+    }
+
+    public Character(int id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, boolean isSynced) {
+        this.id = id;
+        this.name = name;
+        this.strength = strength;
+        this.dexterity = dexterity;
+        this.constitution = constitution;
+        this.intelligence = intelligence;
+        this.wisdom = wisdom;
+        this.charisma = charisma;
+        this.isSynced = isSynced;
+    }
+
+    public Character(String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, boolean isSynced) {
+        this.name = name;
+        this.strength = strength;
+        this.dexterity = dexterity;
+        this.constitution = constitution;
+        this.intelligence = intelligence;
+        this.wisdom = wisdom;
+        this.charisma = charisma;
+        this.isSynced = isSynced;
+    }
+
+    public Character(int id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, int isSynced) {
+        this.id = id;
+        this.name = name;
+        this.strength = strength;
+        this.dexterity = dexterity;
+        this.constitution = constitution;
+        this.intelligence = intelligence;
+        this.wisdom = wisdom;
+        this.charisma = charisma;
+        this.isSynced = isSynced == 1;
+    }
+
+    public Character(String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, int isSynced) {
+        this.name = name;
+        this.strength = strength;
+        this.dexterity = dexterity;
+        this.constitution = constitution;
+        this.intelligence = intelligence;
+        this.wisdom = wisdom;
+        this.charisma = charisma;
+        this.isSynced = isSynced == 1;
     }
 
     public Character(){}
@@ -118,5 +157,21 @@ public class Character {
                 this.wisdom,
                 this.charisma
         );
+    }
+
+    public boolean isSynced(){
+        return this.isSynced;
+    }
+
+    public int isSyncedAsInt(){
+        return (this.isSynced) ? 1 : 0;
+    }
+
+    public void setSynced(boolean synced){
+        this.isSynced = synced;
+    }
+
+    public void setSynced(int synced){
+        this.isSynced = synced == 1;
     }
 }

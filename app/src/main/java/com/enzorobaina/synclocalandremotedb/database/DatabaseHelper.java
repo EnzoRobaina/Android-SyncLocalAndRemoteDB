@@ -15,7 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
 
     public static final String DB_NAME = "synclocalandremotedb";
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 1;
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
 
@@ -26,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CHARACTER_KEY_INTELLIGENCE = "intelligence";
     public static final String CHARACTER_KEY_WISDOM = "wisdom";
     public static final String CHARACTER_KEY_CHARISMA = "charisma";
+    public static final String CHARACTER_KEY_SYNC = "isSynced";
 
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
@@ -44,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(
                 String.format(
-                        "CREATE TABLE %s (%s INTEGER PRIMARY KEY, %s TEXT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER)",
+                        "CREATE TABLE %s (%s INTEGER PRIMARY KEY, %s TEXT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s TINYINT)",
                         CHARACTER_TABLE_NAME,
                         KEY_ID,
                         KEY_NAME,
@@ -53,7 +54,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         CHARACTER_KEY_CONSTITUTION,
                         CHARACTER_KEY_INTELLIGENCE,
                         CHARACTER_KEY_WISDOM,
-                        CHARACTER_KEY_CHARISMA
+                        CHARACTER_KEY_CHARISMA,
+                        CHARACTER_KEY_SYNC
                 )
         );
     }
@@ -97,6 +99,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(CHARACTER_KEY_INTELLIGENCE, character.getIntelligence());
             values.put(CHARACTER_KEY_WISDOM, character.getWisdom());
             values.put(CHARACTER_KEY_CHARISMA, character.getCharisma());
+            values.put(CHARACTER_KEY_SYNC, character.isSyncedAsInt());
             return sqLiteDatabase.insert(CHARACTER_TABLE_NAME,null, values);
         }
         catch (SQLException e) {
@@ -124,7 +127,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getInt(4),
                         cursor.getInt(5),
                         cursor.getInt(6),
-                        cursor.getInt(7)
+                        cursor.getInt(7),
+                        cursor.getInt(8)
                 );
             }
         } catch (SQLException e) {
