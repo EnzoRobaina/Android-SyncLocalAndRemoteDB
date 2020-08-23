@@ -3,9 +3,12 @@ package com.enzorobaina.synclocalandremotedb.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import com.enzorobaina.synclocalandremotedb.model.Character;
 
 import java.util.ArrayList;
@@ -15,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
 
     public static final String DB_NAME = "synclocalandremotedb";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
 
@@ -72,9 +75,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.onCreate(sqLiteDatabase);
     }
 
-    private void deleteAllValuesFrom(String tableName){
+    public void deleteAllValuesFrom(String tableName){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         sqLiteDatabase.execSQL("DELETE FROM "+ tableName);
+    }
+
+    public boolean isCharacterDatabaseEmpty(){
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        try (Cursor cursor = sqLiteDatabase.rawQuery("SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name = '" + CHARACTER_TABLE_NAME + "'", null)) {
+            return (cursor.getCount() <= 0) || (DatabaseUtils.queryNumEntries(sqLiteDatabase, CHARACTER_TABLE_NAME) <= 0);
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void dropTable(String tableName){
@@ -154,8 +168,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             cursor.getInt(4),
                             cursor.getInt(5),
                             cursor.getInt(6),
-                            cursor.getInt(7)
+                            cursor.getInt(7),
+                            cursor.getInt(8)
                         )
+                    );
+                }
+                while (cursor.moveToNext());
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return characters;
+    }
+
+    public List<Character> getAllCharacters(boolean synced){
+        List<Character> characters = new ArrayList<>();
+        try (
+                SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+                Cursor cursor = sqLiteDatabase.rawQuery(
+                        "SELECT * FROM " + CHARACTER_TABLE_NAME + " WHERE " + CHARACTER_KEY_SYNC + " =?",
+                        new String[]{ String.valueOf((synced) ? 1 : 0) }
+                )
+        ) {
+            if (cursor.moveToFirst()) {
+                do {
+                    characters.add(
+                            new Character(
+                                    cursor.getInt(0),
+                                    cursor.getString(1),
+                                    cursor.getInt(2),
+                                    cursor.getInt(3),
+                                    cursor.getInt(4),
+                                    cursor.getInt(5),
+                                    cursor.getInt(6),
+                                    cursor.getInt(7),
+                                    cursor.getInt(8)
+                            )
                     );
                 }
                 while (cursor.moveToNext());
