@@ -4,13 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.adapter.CharacterAdapter;
+import com.enzorobaina.synclocalandremotedb.api.Syncer;
+import com.enzorobaina.synclocalandremotedb.api.VoidCallback;
 import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
 
 public class ListCharacterActivity extends AppCompatActivity {
@@ -33,7 +35,18 @@ public class ListCharacterActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        this.fillRecycler();
+        Syncer syncer = Syncer.getInstance(this);
+        syncer.runFirst(new VoidCallback() {
+            @Override
+            public void onSuccess() {
+                fillRecycler();
+            }
+
+            @Override
+            public void onFail() {
+                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show(); // TODO: Handle this
+            }
+        });
     }
 
     private void fillRecycler(){
