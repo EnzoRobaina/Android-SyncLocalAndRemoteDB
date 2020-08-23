@@ -3,6 +3,7 @@ package com.enzorobaina.synclocalandremotedb.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,13 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         Character character = characterList.get(position);
         holder.idTextView.setText(String.valueOf(character.getId()));
         holder.nameTextView.setText(character.getName());
+
+        if (character.isSynced()){
+            holder.isSyncedImageView.setImageResource(android.R.drawable.presence_online);
+        }
+        else {
+            holder.isSyncedImageView.setImageResource(android.R.drawable.presence_busy);
+        }
     }
 
     @Override
@@ -43,11 +51,13 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView nameTextView;
         public TextView idTextView;
+        public ImageView isSyncedImageView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.nameTextView);
             idTextView = itemView.findViewById(R.id.idTextView);
+            isSyncedImageView = itemView.findViewById(R.id.isSyncedImageView);
         }
     }
 }
