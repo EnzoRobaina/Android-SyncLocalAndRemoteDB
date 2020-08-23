@@ -1,15 +1,25 @@
 package com.enzorobaina.synclocalandremotedb.model;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.Locale;
 
 public class Character {
+    @Expose
     private int id;
+    @Expose
     private String name;
+    @Expose
     private int strength;
+    @Expose
     private int dexterity;
+    @Expose
     private int constitution;
+    @Expose
     private int intelligence;
+    @Expose
     private int wisdom;
+    @Expose
     private int charisma;
     private boolean isSynced;
 
