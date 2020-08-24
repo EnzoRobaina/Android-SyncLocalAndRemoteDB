@@ -4,7 +4,10 @@ import com.enzorobaina.synclocalandremotedb.model.Character;
 
 import java.util.List;
 
+import io.reactivex.rxjava3.core.Observable;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -19,4 +22,7 @@ public interface CharacterService {
 
     @POST("characters/")
     Call<Character> createCharacter(@Body Character character);
+
+    @POST("characters/")
+    Observable<Response<ResponseBody>> createCharacterWithObservable(@Body Character character);
 }
