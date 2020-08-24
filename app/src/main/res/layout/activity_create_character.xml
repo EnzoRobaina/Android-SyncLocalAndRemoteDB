@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
-            android:text="0" />
+            android:text="1" />
 
         <TextView
             android:id="@+id/labelForDexterityEditText"
@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
-            android:text="0" />
+            android:text="1" />
 
         <TextView
             android:id="@+id/labelForConstitutionEditText"
@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
-            android:text="0" />
+            android:text="1" />
 
         <TextView
             android:id="@+id/labelForIntelligenceEditText"
@@ -93,7 +93,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
-            android:text="0" />
+            android:text="1" />
 
         <TextView
             android:id="@+id/labelForWisdomEditText"
@@ -109,7 +109,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
-            android:text="0" />
+            android:text="1" />
 
         <TextView
             android:id="@+id/labelForCharismaEditText"
@@ -125,7 +125,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
-            android:text="0" />
+            android:text="1" />
 
         <Button
             android:id="@+id/btnSubmit"
