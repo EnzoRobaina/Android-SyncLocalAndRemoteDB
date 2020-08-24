@@ -1,9 +1,13 @@
 package com.enzorobaina.synclocalandremotedb.api;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.enzorobaina.synclocalandremotedb.api.service.CharacterService;
 import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
+
+import java.io.IOException;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,7 +64,46 @@ public class Syncer {
         });
     }
 
-    void syncOne(Character character){
+    public void syncOne(Character character){
+        Call<Character> call = characterService.createCharacter(character);
+        call.enqueue(new Callback<Character>() {
+            @Override
+            public void onResponse(Call<Character> call, Response<Character> response) {
 
+            }
+
+            @Override
+            public void onFailure(Call<Character> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void syncOne(Character character, VoidCallback voidCallback){
+        Call<Character> call = characterService.createCharacter(character);
+        call.enqueue(new Callback<Character>() {
+            @Override
+            public void onResponse(Call<Character> call, Response<Character> response) {
+
+                Log.d("syncOne", response.toString());
+
+                if (response.isSuccessful()){
+                    databaseHelper.updateSync(character.getId(), true);
+                    voidCallback.onSuccess();
+                }
+                else {
+                    try { Log.d("syncOne",  response.errorBody().string()); }
+                    catch (IOException e) { e.printStackTrace(); }
+
+                    voidCallback.onFail();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Character> call, Throwable t) {
+                t.printStackTrace();
+                voidCallback.onFail();
+            }
+        });
     }
 }
