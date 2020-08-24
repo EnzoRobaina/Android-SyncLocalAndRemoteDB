@@ -94,6 +94,10 @@ public class Character {
 
     public Character(){}
 
+    public void setId(int id){
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
