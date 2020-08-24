@@ -40,11 +40,12 @@ public class ListCharacterActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 fillRecycler();
+                Toast.makeText(getApplicationContext(), "First Sync Done!", Toast.LENGTH_LONG).show(); // TODO: Handle this
             }
 
             @Override
             public void onFail() {
-                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show(); // TODO: Handle this
+                Toast.makeText(getApplicationContext(), "Something Went Wrong", Toast.LENGTH_LONG).show(); // TODO: Handle this
             }
         });
     }
@@ -67,5 +68,20 @@ public class ListCharacterActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         this.fillRecycler();
+    }
+
+    public void syncCharacters(View view){
+        Syncer.getInstance(this).syncRemoteWithLocal(new VoidCallback() {
+            @Override
+            public void onSuccess() {
+                fillRecycler();
+                Toast.makeText(getApplicationContext(), "Sync Done!", Toast.LENGTH_LONG).show(); // TODO: Handle this
+            }
+
+            @Override
+            public void onFail() {
+                Toast.makeText(getApplicationContext(), "Error Syncing", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
