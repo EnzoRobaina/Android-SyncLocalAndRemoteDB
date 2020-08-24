@@ -3,11 +3,14 @@ package com.enzorobaina.synclocalandremotedb.activity;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.enzorobaina.synclocalandremotedb.R;
+import com.enzorobaina.synclocalandremotedb.api.Syncer;
+import com.enzorobaina.synclocalandremotedb.api.VoidCallback;
 import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
 
@@ -59,11 +62,25 @@ public class CreateCharacterActivity extends AppCompatActivity {
         character.setWisdom(_i(wisdomEditText));
         character.setCharisma(_i(charismaEditText));
 
-        if (databaseHelper.createCharacter(character) > 0){
-            this._startListActivity();
+        long recentlyCreatedCharacterId = databaseHelper.createCharacter(character);
+
+        if (recentlyCreatedCharacterId > 0){
+            character.setId((int) recentlyCreatedCharacterId); // TODO: Figure a better way to set the id
+            Syncer syncer = Syncer.getInstance(this);
+            syncer.syncOne(character, new VoidCallback() {
+                @Override
+                public void onSuccess() {
+                    _startListActivity();
+                }
+
+                @Override
+                public void onFail() {
+                    _startListActivity();
+                }
+            });
         }
         else {
-            Toast.makeText(this, "Ocorreu um erro.", Toast.LENGTH_LONG).show();
+            Log.d("recentlyCreatedCharId", "< 0");
         }
     }
 
