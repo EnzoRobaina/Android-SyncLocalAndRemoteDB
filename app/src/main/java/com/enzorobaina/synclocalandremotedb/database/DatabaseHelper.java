@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
 
     public static final String DB_NAME = "synclocalandremotedb";
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 1;
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
 
@@ -155,7 +155,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<Character> characters = new ArrayList<>();
         try (
                 SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-                Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + CHARACTER_TABLE_NAME, null)
+                Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + CHARACTER_TABLE_NAME + " ORDER BY "+ KEY_ID + " ASC", null)
         ) {
             if (cursor.moveToFirst()) {
                 do {
@@ -187,8 +187,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try (
                 SQLiteDatabase sqLiteDatabase = getReadableDatabase();
                 Cursor cursor = sqLiteDatabase.rawQuery(
-                        "SELECT * FROM " + CHARACTER_TABLE_NAME + " WHERE " + CHARACTER_KEY_SYNC + " =?",
-                        new String[]{ String.valueOf((synced) ? 1 : 0) }
+                        "SELECT * FROM " + CHARACTER_TABLE_NAME + " WHERE " + CHARACTER_KEY_SYNC + " =?" + " ORDER BY "+ KEY_ID + " ASC",
+                        new String[]{ String.valueOf((synced) ? 1 : 0) } // Todo: Refactor me
                 )
         ) {
             if (cursor.moveToFirst()) {
