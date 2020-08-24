@@ -70,11 +70,13 @@ public class CreateCharacterActivity extends AppCompatActivity {
             syncer.syncOne(character, new VoidCallback() {
                 @Override
                 public void onSuccess() {
+                    Toast.makeText(getApplicationContext(), "Sync One Done!", Toast.LENGTH_LONG).show();
                     _startListActivity();
                 }
 
                 @Override
                 public void onFail() {
+                    Toast.makeText(getApplicationContext(), "Sync One Failed!", Toast.LENGTH_LONG).show();
                     _startListActivity();
                 }
             });
