@@ -215,4 +215,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return characters;
     }
+
+    public boolean updateSync(int characterId, boolean syncStatus){
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(CHARACTER_KEY_SYNC, (syncStatus) ? 1 : 0); // TODO: Refactor me
+        return sqLiteDatabase.update(CHARACTER_TABLE_NAME, values, KEY_ID + " = ?", new String[]{ String.valueOf(characterId) }) > 0;
+    }
 }
