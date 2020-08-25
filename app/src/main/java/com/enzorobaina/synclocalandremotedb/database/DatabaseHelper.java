@@ -1,13 +1,23 @@
 package com.enzorobaina.synclocalandremotedb.database;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.CharArrayBuffer;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.enzorobaina.synclocalandremotedb.model.Character;
 
@@ -120,6 +130,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public long createCharacter(ContentValues values){
+        try (SQLiteDatabase sqLiteDatabase = getWritableDatabase()) {
+            return sqLiteDatabase.insert(CHARACTER_TABLE_NAME,null, values);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int updateSync(String characterId, ContentValues values){
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        return sqLiteDatabase.update(CHARACTER_TABLE_NAME, values, KEY_ID + " = ?", new String[]{ String.valueOf(characterId) });
+    }
+
+    public Cursor getCharacterCursor(@Nullable String[] selectionArgs, @Nullable String sortOrder){
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        try (Cursor cursor = queryBuilder.query(getReadableDatabase(), null, KEY_ID + "=?", selectionArgs, null, null, sortOrder)){
+            return cursor;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Cursor getMultipleCharacterCursor(@Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder){
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        try (Cursor cursor = queryBuilder.query(getReadableDatabase(), null, selection, selectionArgs, null, null, sortOrder)){
+            return cursor;
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Character getCharacter(int id) {
