@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.enzorobaina.synclocalandremotedb">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <permission android:name="com.enzorobaina.synclocalandremotedb.READ_DATABASE" android:protectionLevel="normal" />
+    <permission android:name="com.enzorobaina.synclocalandremotedb.WRITE_DATABASE" android:protectionLevel="normal" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -26,6 +28,13 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.enzorobaina.synclocalandremotedb"
+            android:name=".database.CharacterContentProvider"
+            android:exported="true"
+            android:readPermission="com.enzorobaina.synclocalandremotedb.READ_DATABASE"
+            android:writePermission="com.enzorobaina.synclocalandremotedb.WRITE_DATABASE"
+            />
     </application>
 
 </manifest>
