@@ -7,134 +7,139 @@
     android:padding="16dp"
     tools:context=".activity.CreateCharacterActivity">
 
-    <LinearLayout
-        android:id="@+id/createCharacterLL"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/labelForNameEditText"
+        <LinearLayout
+            android:id="@+id/createCharacterLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/nameEditText"
-            android:text="@string/char_name" />
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/nameEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName" />
+            <TextView
+                android:id="@+id/labelForNameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/nameEditText"
+                android:text="@string/char_name" />
 
-        <TextView
-            android:id="@+id/labelForStrengthEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:labelFor="@id/strengthEditText"
-            android:text="@string/char_strength" />
+            <EditText
+                android:id="@+id/nameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName" />
 
-        <EditText
-            android:id="@+id/strengthEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:text="1" />
+            <TextView
+                android:id="@+id/labelForStrengthEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/strengthEditText"
+                android:text="@string/char_strength" />
 
-        <TextView
-            android:id="@+id/labelForDexterityEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:labelFor="@id/dexterityEditText"
-            android:text="@string/char_dex" />
+            <EditText
+                android:id="@+id/strengthEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="1" />
 
-        <EditText
-            android:id="@+id/dexterityEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:text="1" />
+            <TextView
+                android:id="@+id/labelForDexterityEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/dexterityEditText"
+                android:text="@string/char_dex" />
 
-        <TextView
-            android:id="@+id/labelForConstitutionEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:labelFor="@id/constitutionEditText"
-            android:text="@string/char_const" />
+            <EditText
+                android:id="@+id/dexterityEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="1" />
 
-        <EditText
-            android:id="@+id/constitutionEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:text="1" />
+            <TextView
+                android:id="@+id/labelForConstitutionEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/constitutionEditText"
+                android:text="@string/char_const" />
 
-        <TextView
-            android:id="@+id/labelForIntelligenceEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:labelFor="@id/intelligenceEditText"
-            android:text="@string/char_intel" />
+            <EditText
+                android:id="@+id/constitutionEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="1" />
 
-        <EditText
-            android:id="@+id/intelligenceEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:text="1" />
+            <TextView
+                android:id="@+id/labelForIntelligenceEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/intelligenceEditText"
+                android:text="@string/char_intel" />
 
-        <TextView
-            android:id="@+id/labelForWisdomEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:labelFor="@id/wisdomEditText"
-            android:text="@string/char_wisdom" />
+            <EditText
+                android:id="@+id/intelligenceEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="1" />
 
-        <EditText
-            android:id="@+id/wisdomEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:text="1" />
+            <TextView
+                android:id="@+id/labelForWisdomEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/wisdomEditText"
+                android:text="@string/char_wisdom" />
 
-        <TextView
-            android:id="@+id/labelForCharismaEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:labelFor="@id/charismaEditText"
-            android:text="@string/char_charisma" />
+            <EditText
+                android:id="@+id/wisdomEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="1" />
 
-        <EditText
-            android:id="@+id/charismaEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:text="1" />
+            <TextView
+                android:id="@+id/labelForCharismaEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/charismaEditText"
+                android:text="@string/char_charisma" />
 
-        <Button
-            android:id="@+id/btnSubmit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#8951EC"
-            android:onClick="onSubmit"
-            android:text="Submit"
-            android:textColor="#FFFFFF" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/charismaEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="1" />
+
+            <Button
+                android:id="@+id/btnSubmit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#8951EC"
+                android:onClick="onSubmit"
+                android:text="Submit"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
