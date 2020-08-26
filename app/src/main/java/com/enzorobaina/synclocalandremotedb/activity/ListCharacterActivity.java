@@ -51,7 +51,10 @@ public class ListCharacterActivity extends AppCompatActivity {
     }
 
     private void fillRecycler(){
-        recyclerView.setAdapter(new CharacterAdapter(databaseHelper.getAllCharacters()));
+        if (recyclerView.getAdapter() == null){
+            recyclerView.setAdapter(new CharacterAdapter(databaseHelper.getAllCharacters()));
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     public void addCharacter(View view){
