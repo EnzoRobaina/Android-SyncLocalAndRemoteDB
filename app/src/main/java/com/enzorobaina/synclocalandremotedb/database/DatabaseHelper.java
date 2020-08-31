@@ -1,37 +1,21 @@
 package com.enzorobaina.synclocalandremotedb.database;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.CharArrayBuffer;
-import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.enzorobaina.synclocalandremotedb.model.Character;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
-
     public static final String DB_NAME = "synclocalandremotedb";
     public static final int DB_VERSION = 1;
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
-
     public static final String CHARACTER_TABLE_NAME = "character";
     public static final String CHARACTER_KEY_STRENGTH = "strength";
     public static final String CHARACTER_KEY_DEXTERITY = "dexterity";
@@ -85,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.onCreate(sqLiteDatabase);
     }
 
-    public void deleteAllValuesFrom(String tableName){
+    private void deleteAllValuesFrom(String tableName){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         sqLiteDatabase.execSQL("DELETE FROM "+ tableName);
     }
@@ -110,28 +94,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_DROP_TABLE + tableName);
     }
 
-    public long createCharacter(Character character){
-        try (SQLiteDatabase sqLiteDatabase = getWritableDatabase()) {
-            ContentValues values = new ContentValues();
-            if (character.getId() != 0){
-                values.put(KEY_ID, character.getId());
-            }
-            values.put(KEY_NAME, character.getName());
-            values.put(CHARACTER_KEY_STRENGTH, character.getStrength());
-            values.put(CHARACTER_KEY_DEXTERITY, character.getDexterity());
-            values.put(CHARACTER_KEY_CONSTITUTION, character.getConstitution());
-            values.put(CHARACTER_KEY_INTELLIGENCE, character.getIntelligence());
-            values.put(CHARACTER_KEY_WISDOM, character.getWisdom());
-            values.put(CHARACTER_KEY_CHARISMA, character.getCharisma());
-            values.put(CHARACTER_KEY_SYNC, character.isSyncedAsInt());
-            return sqLiteDatabase.insert(CHARACTER_TABLE_NAME,null, values);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
     public long createCharacter(ContentValues values){
         try (SQLiteDatabase sqLiteDatabase = getWritableDatabase()) {
             return sqLiteDatabase.insert(CHARACTER_TABLE_NAME,null, values);
@@ -149,124 +111,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getCharacterCursor(@Nullable String[] selectionArgs, @Nullable String sortOrder){
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        try (Cursor cursor = queryBuilder.query(getReadableDatabase(), null, KEY_ID + "=?", selectionArgs, null, null, sortOrder)){
-            return cursor;
+        queryBuilder.setTables(CHARACTER_TABLE_NAME);
+        Cursor cursor = null;
+        try {
+            cursor = queryBuilder.query(getReadableDatabase(), null, KEY_ID + "=?", selectionArgs, null, null, sortOrder);
         }
         catch (SQLException e){
             e.printStackTrace();
-            return null;
         }
+        return cursor;
     }
 
     public Cursor getMultipleCharacterCursor(@Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder){
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        try (Cursor cursor = queryBuilder.query(getReadableDatabase(), null, selection, selectionArgs, null, null, sortOrder)){
-            return cursor;
+        queryBuilder.setTables(CHARACTER_TABLE_NAME);
+        Cursor cursor = null;
+        try {
+            cursor = queryBuilder.query(getReadableDatabase(), null, selection, selectionArgs, null, null, sortOrder);
         }
         catch (SQLException e){
             e.printStackTrace();
-            return null;
         }
-    }
-
-    public Character getCharacter(int id) {
-        Character character = null;
-        try (
-                SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-                Cursor cursor = sqLiteDatabase.rawQuery(
-                        "SELECT * FROM " + CHARACTER_TABLE_NAME + " WHERE " + KEY_ID + " =? " + "LIMIT 1",
-                        new String[]{ String.valueOf(id) }
-                )
-        ) {
-            if (cursor != null) {
-                cursor.moveToFirst();
-                character = new Character(
-                        cursor.getInt(0),
-                        cursor.getString(1),
-                        cursor.getInt(2),
-                        cursor.getInt(3),
-                        cursor.getInt(4),
-                        cursor.getInt(5),
-                        cursor.getInt(6),
-                        cursor.getInt(7),
-                        cursor.getInt(8)
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return character;
-    }
-
-    public List<Character> getAllCharacters(){
-        List<Character> characters = new ArrayList<>();
-        try (
-                SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-                Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + CHARACTER_TABLE_NAME + " ORDER BY "+ KEY_ID + " ASC", null)
-        ) {
-            if (cursor.moveToFirst()) {
-                do {
-                    characters.add(
-                        new Character(
-                            cursor.getInt(0),
-                            cursor.getString(1),
-                            cursor.getInt(2),
-                            cursor.getInt(3),
-                            cursor.getInt(4),
-                            cursor.getInt(5),
-                            cursor.getInt(6),
-                            cursor.getInt(7),
-                            cursor.getInt(8)
-                        )
-                    );
-                }
-                while (cursor.moveToNext());
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return characters;
-    }
-
-    public List<Character> getAllCharacters(boolean synced){
-        List<Character> characters = new ArrayList<>();
-        try (
-                SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-                Cursor cursor = sqLiteDatabase.rawQuery(
-                        "SELECT * FROM " + CHARACTER_TABLE_NAME + " WHERE " + CHARACTER_KEY_SYNC + " =?" + " ORDER BY "+ KEY_ID + " ASC",
-                        new String[]{ String.valueOf((synced) ? 1 : 0) } // Todo: Refactor me
-                )
-        ) {
-            if (cursor.moveToFirst()) {
-                do {
-                    characters.add(
-                            new Character(
-                                    cursor.getInt(0),
-                                    cursor.getString(1),
-                                    cursor.getInt(2),
-                                    cursor.getInt(3),
-                                    cursor.getInt(4),
-                                    cursor.getInt(5),
-                                    cursor.getInt(6),
-                                    cursor.getInt(7),
-                                    cursor.getInt(8)
-                            )
-                    );
-                }
-                while (cursor.moveToNext());
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return characters;
-    }
-
-    public boolean updateSync(int characterId, boolean syncStatus){
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(CHARACTER_KEY_SYNC, (syncStatus) ? 1 : 0); // TODO: Refactor me
-        return sqLiteDatabase.update(CHARACTER_TABLE_NAME, values, KEY_ID + " = ?", new String[]{ String.valueOf(characterId) }) > 0;
+        return cursor;
     }
 }
