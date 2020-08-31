@@ -27,8 +27,8 @@ public class CharacterContentProvider extends ContentProvider {
     private static final UriMatcher uriMatcher;
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(AUTHORITY, DatabaseHelper.CHARACTER_TABLE_NAME, ALL_CHARACTERS);
         uriMatcher.addURI(AUTHORITY, DatabaseHelper.CHARACTER_TABLE_NAME + "/#", SINGLE_CHARACTER);
+        uriMatcher.addURI(AUTHORITY, DatabaseHelper.CHARACTER_TABLE_NAME, ALL_CHARACTERS);
     }
     @Override
     public boolean onCreate() {
@@ -43,7 +43,7 @@ public class CharacterContentProvider extends ContentProvider {
             case ALL_CHARACTERS:
                 return databaseHelper.getMultipleCharacterCursor(selection, selectionArgs, sortOrder);
             case SINGLE_CHARACTER:
-                return databaseHelper.getCharacterCursor(selectionArgs, sortOrder == null ? "ASC" : sortOrder);
+                return databaseHelper.getCharacterCursor(selectionArgs, sortOrder == null ? "ID ASC" : sortOrder);
             default:
                 throw new IllegalArgumentException("Invalid URI: " + uri);
         }
@@ -66,7 +66,7 @@ public class CharacterContentProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
         switch (uriMatcher.match(uri)){
-            case SINGLE_CHARACTER:
+            case ALL_CHARACTERS:
                 long id = databaseHelper.createCharacter(contentValues);
                 if (id > 0){
                     Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
@@ -89,7 +89,7 @@ public class CharacterContentProvider extends ContentProvider {
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         switch (uriMatcher.match(uri)){
             case SINGLE_CHARACTER:
-                String id = uri.getPathSegments().get(1);
+                String id = uri.getLastPathSegment();
                 int affectedRows = databaseHelper.updateSync(id, contentValues);
                 if (affectedRows > 0){
                     Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
