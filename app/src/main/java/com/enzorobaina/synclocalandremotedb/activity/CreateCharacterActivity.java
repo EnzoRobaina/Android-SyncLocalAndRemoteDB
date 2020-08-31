@@ -1,6 +1,7 @@
 package com.enzorobaina.synclocalandremotedb.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -12,15 +13,16 @@ import android.widget.Toast;
 import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.api.Syncer;
 import com.enzorobaina.synclocalandremotedb.api.VoidCallback;
-import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
+import com.enzorobaina.synclocalandremotedb.database.ContentHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
+import com.enzorobaina.synclocalandremotedb.utils.ViewUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class CreateCharacterActivity extends AppCompatActivity {
-    DatabaseHelper databaseHelper;
+    ContentHelper contentHelper;
     EditText nameEditText;
     EditText strengthEditText;
     EditText dexterityEditText;
@@ -29,6 +31,7 @@ public class CreateCharacterActivity extends AppCompatActivity {
     EditText wisdomEditText;
     EditText charismaEditText;
     Button submit;
+    View spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +49,8 @@ public class CreateCharacterActivity extends AppCompatActivity {
         wisdomEditText = findViewById(R.id.wisdomEditText);
         charismaEditText = findViewById(R.id.charismaEditText);
         submit = findViewById(R.id.btnSubmit);
-        databaseHelper = DatabaseHelper.getInstance(this);
+        contentHelper = ContentHelper.getInstance(this);
+        spinner = findViewById(R.id.spinnerOverlay);
     }
 
     private String _s(EditText editText){
@@ -55,6 +59,15 @@ public class CreateCharacterActivity extends AppCompatActivity {
 
     private int _i(EditText editText){
         return Integer.parseInt(editText.getText().toString());
+    }
+
+    private void _showSpinner(){
+        spinner.bringToFront();
+        ViewUtils.animateView(spinner, View.VISIBLE, 0.4f, 200);
+    }
+
+    private void _hideSpinner(){
+        ViewUtils.animateView(spinner, View.GONE, 0, 200);
     }
 
     private boolean _fieldsAreOk(){
@@ -115,6 +128,7 @@ public class CreateCharacterActivity extends AppCompatActivity {
         }
 
         _disableSubmitBtn();
+        _showSpinner();
         Character character = new Character();
         character.setName(_s(nameEditText));
         character.setStrength(_i(strengthEditText));
@@ -124,7 +138,7 @@ public class CreateCharacterActivity extends AppCompatActivity {
         character.setWisdom(_i(wisdomEditText));
         character.setCharisma(_i(charismaEditText));
 
-        long recentlyCreatedCharacterId = databaseHelper.createCharacter(character);
+        long recentlyCreatedCharacterId = contentHelper.createCharacter(character);
 
         if (recentlyCreatedCharacterId > 0){
             character.setId((int) recentlyCreatedCharacterId); // TODO: Figure a better way to set the id
@@ -133,12 +147,16 @@ public class CreateCharacterActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(getApplicationContext(), "Sync One Done!", Toast.LENGTH_LONG).show();
-                    _startListActivity();
                 }
 
                 @Override
                 public void onFail() {
                     Toast.makeText(getApplicationContext(), "Sync One Failed!", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void always() {
+                    _hideSpinner();
                     _startListActivity();
                 }
             });

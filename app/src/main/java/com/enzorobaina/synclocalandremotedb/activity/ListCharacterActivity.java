@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -13,11 +14,13 @@ import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.adapter.CharacterAdapter;
 import com.enzorobaina.synclocalandremotedb.api.Syncer;
 import com.enzorobaina.synclocalandremotedb.api.VoidCallback;
-import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
+import com.enzorobaina.synclocalandremotedb.database.ContentHelper;
+import com.enzorobaina.synclocalandremotedb.utils.ViewUtils;
 
 public class ListCharacterActivity extends AppCompatActivity {
     RecyclerView recyclerView;
-    DatabaseHelper databaseHelper;
+    ContentHelper contentHelper;
+    View spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +30,8 @@ public class ListCharacterActivity extends AppCompatActivity {
     }
 
     private void initComponents(){
-        databaseHelper = DatabaseHelper.getInstance(this);
+        spinner = findViewById(R.id.spinnerOverlay);
+        contentHelper = ContentHelper.getInstance(this);
 
         recyclerView = findViewById(R.id.listCharacterRecyclerView);
         recyclerView.setHasFixedSize(true);
@@ -39,7 +43,6 @@ public class ListCharacterActivity extends AppCompatActivity {
         syncer.runFirst(new VoidCallback() {
             @Override
             public void onSuccess() {
-                fillRecycler();
                 Toast.makeText(getApplicationContext(), "First Sync Done!", Toast.LENGTH_LONG).show(); // TODO: Handle this
             }
 
@@ -47,12 +50,18 @@ public class ListCharacterActivity extends AppCompatActivity {
             public void onFail() {
                 Toast.makeText(getApplicationContext(), "Something Went Wrong", Toast.LENGTH_LONG).show(); // TODO: Handle this
             }
+
+            @Override
+            public void always() {
+                Log.d("runFirst", "always");
+                fillRecycler();
+            }
         });
     }
 
     private void fillRecycler(){
         if (recyclerView.getAdapter() == null){
-            recyclerView.setAdapter(new CharacterAdapter(databaseHelper.getAllCharacters()));
+            recyclerView.setAdapter(new CharacterAdapter(contentHelper.getAllCharacters()));
         }
         recyclerView.getAdapter().notifyDataSetChanged();
     }
@@ -73,17 +82,32 @@ public class ListCharacterActivity extends AppCompatActivity {
         this.fillRecycler();
     }
 
+    private void _showSpinner(){
+        spinner.bringToFront();
+        ViewUtils.animateView(spinner, View.VISIBLE, 0.4f, 200);
+    }
+
+    private void _hideSpinner(){
+        ViewUtils.animateView(spinner, View.GONE, 0, 200);
+    }
+
     public void syncCharacters(View view){
+        _showSpinner();
         Syncer.getInstance(this).syncRemoteWithLocal(new VoidCallback() {
             @Override
             public void onSuccess() {
-                fillRecycler();
                 Toast.makeText(getApplicationContext(), "Sync Done!", Toast.LENGTH_LONG).show(); // TODO: Handle this
             }
 
             @Override
             public void onFail() {
                 Toast.makeText(getApplicationContext(), "Error Syncing", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void always() {
+                _hideSpinner();
+                fillRecycler();
             }
         });
     }
