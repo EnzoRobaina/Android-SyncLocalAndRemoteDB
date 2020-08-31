@@ -3,6 +3,7 @@ package com.enzorobaina.synclocalandremotedb.api;
 import android.content.Context;
 import android.util.Log;
 import com.enzorobaina.synclocalandremotedb.api.service.CharacterService;
+import com.enzorobaina.synclocalandremotedb.database.ContentHelper;
 import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import retrofit2.Response;
 
 public class Syncer {
     private static Syncer instance = null;
+    private ContentHelper contentHelper;
     private DatabaseHelper databaseHelper;
     private CharacterService characterService;
 
@@ -32,13 +34,14 @@ public class Syncer {
     }
 
     private Syncer(Context context){
-        this.databaseHelper = DatabaseHelper.getInstance(context);
+        this.contentHelper = ContentHelper.getInstance(context);
         this.characterService = RetrofitConfig.getInstance().getCharacterService();
+        this.databaseHelper = DatabaseHelper.getInstance(context);
     }
 
     public void syncRemoteWithLocal(VoidCallback voidCallback){
         CharacterService characterRxService = RetrofitConfig.getInstance().getCharacterRxService();
-        List<Character> unsyncedCharacters = databaseHelper.getAllCharacters(false);
+        List<Character> unsyncedCharacters = contentHelper.getAllCharactersWithSync(false);
 
         Log.d("syncRemoteWithLocal", String.format("%s chars are unsynced", unsyncedCharacters.size()));
 
@@ -49,7 +52,8 @@ public class Syncer {
                 .doOnNext(response -> {
                     Log.d("doOnNext", response.toString());
                     if (response.isSuccessful()){
-                        databaseHelper.updateSync(c.getId(), true);
+                        boolean gotSynced = contentHelper.updateSync(c.getId(), true);
+                        Log.d("gotSynced", gotSynced + "");
                     }
                 })
             );
@@ -64,9 +68,9 @@ public class Syncer {
             @Override
             public void onNext(@NonNull Response<ResponseBody> responseBodyResponse) {}
             @Override
-            public void onError(@NonNull Throwable e) { e.printStackTrace(); voidCallback.onFail(); }
+            public void onError(@NonNull Throwable e) { e.printStackTrace(); voidCallback.onFail(); voidCallback.always(); }
             @Override
-            public void onComplete() { Log.d("concat", "completed"); voidCallback.onSuccess(); }
+            public void onComplete() { Log.d("concat", "completed"); voidCallback.onSuccess(); voidCallback.always(); }
         });
     }
 
@@ -74,7 +78,7 @@ public class Syncer {
         if (databaseHelper.isCharacterDatabaseEmpty()){
             this.syncLocalWithRemote(voidCallback);
         }
-        else { return; }
+        else { voidCallback.always(); }
     }
 
     public void syncLocalWithRemote(VoidCallback voidCallback){
@@ -85,17 +89,20 @@ public class Syncer {
                 List<Character> characterList = response.body();
                 for (Character character : characterList){
                     character.setSynced(true); // TODO: Deserialize and set synced to true automatically
-                    databaseHelper.createCharacter(character);
+                    contentHelper.createCharacter(character);
                 }
                 voidCallback.onSuccess();
+                voidCallback.always();
             }
 
             @Override
             public void onFailure(Call<List<Character>> call, Throwable t) {
                 t.printStackTrace();
                 voidCallback.onFail();
+                voidCallback.always();
             }
         });
+
     }
 
     public void syncOne(Character character){
@@ -117,7 +124,7 @@ public class Syncer {
                 Log.d("syncOne", response.toString());
 
                 if (response.isSuccessful()){
-                    databaseHelper.updateSync(character.getId(), true);
+                    contentHelper.updateSync(character.getId(), true);
                     voidCallback.onSuccess();
                 }
                 else {
@@ -126,12 +133,14 @@ public class Syncer {
 
                     voidCallback.onFail();
                 }
+                voidCallback.always();
             }
 
             @Override
             public void onFailure(Call<Character> call, Throwable t) {
                 t.printStackTrace();
                 voidCallback.onFail();
+                voidCallback.always();
             }
         });
     }
