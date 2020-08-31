@@ -161,9 +161,10 @@ public class Character {
     public String toString(){
         return String.format(
                 Locale.ENGLISH,
-                "ID: %d, Name: %s, St: %d, Dex: %d, Const: %d, Intel: %d, Wisd: %d, Char: %d",
+                "ID: %d, Name: %s, Sync: %s, St: %d, Dex: %d, Const: %d, Intel: %d, Wisd: %d, Char: %d",
                 this.id,
                 this.name,
+                this.isSynced,
                 this.strength,
                 this.dexterity,
                 this.constitution,
