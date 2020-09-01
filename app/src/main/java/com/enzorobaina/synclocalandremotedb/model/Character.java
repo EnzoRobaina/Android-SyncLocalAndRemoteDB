@@ -1,11 +1,18 @@
 package com.enzorobaina.synclocalandremotedb.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
-
 import java.util.Locale;
 
-public class Character {
-    @Expose
+@Entity(tableName = Character.tableName)
+public class Character implements Parcelable {
+    public static final String tableName = "character";
+    public static final int UNSYNCED = 0;
+    public static final int SYNCED = 1;
+    @Expose @PrimaryKey(autoGenerate = true)
     private int id;
     @Expose
     private String name;
@@ -189,4 +196,45 @@ public class Character {
     public void setSynced(int synced){
         this.isSynced = synced == 1;
     }
+
+    protected Character(Parcel in) {
+        name = in.readString();
+        strength = in.readInt();
+        dexterity = in.readInt();
+        constitution = in.readInt();
+        intelligence = in.readInt();
+        wisdom = in.readInt();
+        charisma = in.readInt();
+        isSynced = in.readByte() != 0x00;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeInt(strength);
+        dest.writeInt(dexterity);
+        dest.writeInt(constitution);
+        dest.writeInt(intelligence);
+        dest.writeInt(wisdom);
+        dest.writeInt(charisma);
+        dest.writeByte((byte) (isSynced ? 0x01 : 0x00));
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Character> CREATOR = new Parcelable.Creator<Character>() {
+        @Override
+        public Character createFromParcel(Parcel in) {
+            return new Character(in);
+        }
+
+        @Override
+        public Character[] newArray(int size) {
+            return new Character[size];
+        }
+    };
 }
