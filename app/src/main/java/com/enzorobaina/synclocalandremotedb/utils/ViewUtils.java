@@ -3,6 +3,7 @@ package com.enzorobaina.synclocalandremotedb.utils;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;
+import android.widget.EditText;
 
 public class ViewUtils {
     public static void animateView(final View view, final int toVisibility, float toAlpha, int duration) {
@@ -20,5 +21,13 @@ public class ViewUtils {
                     view.setVisibility(toVisibility);
                 }
             });
+    }
+
+    public static String getString(EditText editText){
+        return editText.getText().toString().trim();
+    }
+
+    public static int getInt(EditText editText){
+        return Integer.parseInt(editText.getText().toString());
     }
 }
