@@ -51,7 +51,7 @@ public class ContentHelper {
                 while (cursor.moveToNext()) {
                     characters.add(
                         new Character(
-                            cursor.getInt(0),
+                            cursor.getLong(0),
                             cursor.getString(1),
                             cursor.getInt(2),
                             cursor.getInt(3),
@@ -79,7 +79,7 @@ public class ContentHelper {
                 while (cursor.moveToNext()) {
                     characters.add(
                         new Character(
-                            cursor.getInt(0),
+                            cursor.getLong(0),
                             cursor.getString(1),
                             cursor.getInt(2),
                             cursor.getInt(3),
@@ -97,7 +97,7 @@ public class ContentHelper {
         return characters;
     }
 
-    public boolean updateSync(int characterId, boolean syncStatus){
+    public boolean updateSync(long characterId, boolean syncStatus){
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.CHARACTER_KEY_SYNC, (syncStatus) ? 1 : 0); // TODO: Refactor me
         Uri characterURI = ContentUris.withAppendedId(CharacterContentProvider.CONTENT_URI, characterId);

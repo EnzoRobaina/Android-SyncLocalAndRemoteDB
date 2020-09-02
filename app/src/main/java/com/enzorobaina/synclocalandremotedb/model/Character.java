@@ -13,7 +13,7 @@ public class Character implements Parcelable {
     public static final int UNSYNCED = 0;
     public static final int SYNCED = 1;
     @Expose @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
     @Expose
     private String name;
     @Expose
@@ -30,7 +30,7 @@ public class Character implements Parcelable {
     private int charisma;
     private boolean isSynced;
 
-    public Character(int id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma) {
+    public Character(long id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma) {
         this.id = id;
         this.name = name;
         this.strength = strength;
@@ -53,7 +53,7 @@ public class Character implements Parcelable {
         this.isSynced = false;
     }
 
-    public Character(int id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, boolean isSynced) {
+    public Character(long id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, boolean isSynced) {
         this.id = id;
         this.name = name;
         this.strength = strength;
@@ -76,7 +76,7 @@ public class Character implements Parcelable {
         this.isSynced = isSynced;
     }
 
-    public Character(int id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, int isSynced) {
+    public Character(long id, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma, int isSynced) {
         this.id = id;
         this.name = name;
         this.strength = strength;
@@ -101,11 +101,11 @@ public class Character implements Parcelable {
 
     public Character(){}
 
-    public void setId(int id){
+    public void setId(long id){
         this.id = id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
