@@ -11,7 +11,7 @@ import com.enzorobaina.synclocalandremotedb.model.Character;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Character.class}, version = 1, exportSchema = false)
+@Database(entities = {Character.class}, version = 2, exportSchema = false)
 public abstract class CharacterRoomDatabase extends RoomDatabase {
     public static final String DATABASE_NAME = "character_database";
     public abstract CharacterDAO characterDAO();
