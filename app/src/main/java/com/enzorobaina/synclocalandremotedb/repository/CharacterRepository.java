@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.lifecycle.LiveData;
 
 import com.enzorobaina.synclocalandremotedb.api.IntCallback;
+import com.enzorobaina.synclocalandremotedb.api.ListCallback;
 import com.enzorobaina.synclocalandremotedb.api.LongCallback;
 import com.enzorobaina.synclocalandremotedb.database.CharacterDAO;
 import com.enzorobaina.synclocalandremotedb.database.CharacterRoomDatabase;
@@ -57,6 +58,30 @@ public class CharacterRepository {
             int value = characterDAO.update(character);
             if (value > 0){
                 callback.onSuccess(value);
+            }
+            else {
+                callback.onFail();
+            }
+        });
+    }
+
+    public void updateSync(long id, int syncStatus, IntCallback callback){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            int value = characterDAO.updateSync(id, syncStatus);
+            if (value > 0){
+                callback.onSuccess(value);
+            }
+            else {
+                callback.onFail();
+            }
+        });
+    }
+
+    public void insertMultiple(List<Character> characters, ListCallback callback){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            List<Long> values = characterDAO.insertMultiple(characters);
+            if (values != null && values.size() > 0){
+                callback.onSuccess(values);
             }
             else {
                 callback.onFail();
