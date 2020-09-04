@@ -15,8 +15,8 @@ import java.util.List;
 
 public class CharacterRepository {
     private CharacterDAO characterDAO;
-    private LiveData<List<Character>> allCharacters;
-    private LiveData<List<Character>> allUnsyncedCharacters;
+    private LiveData<List<Character>> allCharactersLiveData;
+    private LiveData<List<Character>> allUnsyncedCharactersLiveData;
     private static CharacterRepository instance;
 
     public static synchronized CharacterRepository getInstance(Application application){
@@ -29,16 +29,24 @@ public class CharacterRepository {
     private CharacterRepository(Application application){
         CharacterRoomDatabase database = CharacterRoomDatabase.getInstance(application);
         characterDAO = database.characterDAO();
-        allCharacters = characterDAO.getAllCharactersLiveData();
-        allUnsyncedCharacters = characterDAO.getAllCharactersLiveDataWithSync(Character.UNSYNCED);
+        allCharactersLiveData = characterDAO.getAllCharactersLiveData();
+        allUnsyncedCharactersLiveData = characterDAO.getAllCharactersLiveDataWithSync(Character.UNSYNCED);
     }
 
-    public LiveData<List<Character>> getAllCharacters(){
-        return allCharacters;
+    public LiveData<List<Character>> getAllCharactersLiveData(){
+        return allCharactersLiveData;
     }
 
-    public LiveData<List<Character>> getAllUnsyncedCharacters(){
-        return allUnsyncedCharacters;
+    public LiveData<List<Character>> getAllUnsyncedCharactersLiveData(){
+        return allUnsyncedCharactersLiveData;
+    }
+
+    public List<Character> getAllCharacters(){
+        return characterDAO.getAllCharacters();
+    }
+
+    public List<Character> getAllUnsyncedCharacters(){
+        return characterDAO.getAllCharactersWithSync(Character.UNSYNCED);
     }
 
     public void insert(Character character, LongCallback callback) {

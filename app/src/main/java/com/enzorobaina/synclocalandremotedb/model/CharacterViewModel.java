@@ -20,8 +20,8 @@ public class CharacterViewModel extends AndroidViewModel {
     public CharacterViewModel(@NonNull Application application) {
         super(application);
         characterRepository = CharacterRepository.getInstance(application);
-        allCharacters = characterRepository.getAllCharacters();
-        allUnsyncedCharacters = characterRepository.getAllUnsyncedCharacters();
+        allCharacters = characterRepository.getAllCharactersLiveData();
+        allUnsyncedCharacters = characterRepository.getAllUnsyncedCharactersLiveData();
     }
 
     public LiveData<List<Character>> getAllCharacters() {
