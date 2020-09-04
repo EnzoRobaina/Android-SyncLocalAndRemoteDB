@@ -24,5 +24,8 @@ public interface CharacterService {
     Call<Character> createCharacter(@Body Character character);
 
     @POST("characters/")
+    Call<Response<ResponseBody>> createMultipleCharacters(@Body List<Character> characters);
+
+    @POST("characters/")
     Observable<Response<ResponseBody>> createCharacterWithObservable(@Body Character character);
 }
