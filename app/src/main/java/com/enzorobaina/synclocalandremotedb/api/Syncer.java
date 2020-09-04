@@ -1,11 +1,14 @@
 package com.enzorobaina.synclocalandremotedb.api;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 import com.enzorobaina.synclocalandremotedb.api.service.CharacterService;
 import com.enzorobaina.synclocalandremotedb.database.ContentHelper;
 import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
+import com.enzorobaina.synclocalandremotedb.repository.CharacterRepository;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +28,58 @@ public class Syncer {
     private ContentHelper contentHelper;
     private DatabaseHelper databaseHelper;
     private CharacterService characterService;
+    private CharacterRepository repository;
 
-    public static synchronized Syncer getInstance(Context context){
+    public static synchronized Syncer getInstance(Application application){
         if (instance == null){
-            instance = new Syncer(context);
+            instance = new Syncer(application);
         }
         return instance;
     }
 
-    private Syncer(Context context){
-        this.contentHelper = ContentHelper.getInstance(context);
+    private Syncer(Application application){
         this.characterService = RetrofitConfig.getInstance().getCharacterService();
-        this.databaseHelper = DatabaseHelper.getInstance(context);
+        this.repository = CharacterRepository.getInstance(application);
+    }
+
+    public void fetchAndInsert(){
+        Call<List<Character>> call = characterService.getCharacters();
+        call.enqueue(new Callback<List<Character>>() {
+            @Override
+            public void onResponse(Call<List<Character>> call, Response<List<Character>> response) {
+                Log.d("fetchAndIns", response.body().toString());
+                List<Character> responseList = response.body();
+                repository.insertMultiple(responseList, new ListCallback() {
+                    @Override
+                    public void onSuccess(List<Long> value) {
+                        for (Long id : value){
+                            repository.updateSync(id, Character.SYNCED, new IntCallback() {
+                                @Override
+                                public void onSuccess(int value) {
+                                    Log.d("updateSync", "for " + value);
+                                }
+
+                                @Override
+                                public void onFail() {
+
+                                    Log.d("updateSync", "failed for " + value);
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onFail() {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<List<Character>> call, Throwable t) {
+
+            }
+        });
     }
 
     public void syncRemoteWithLocal(VoidCallback voidCallback){
