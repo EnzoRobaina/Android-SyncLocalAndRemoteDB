@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.adapter.CharacterViewModelAdapter;
+import com.enzorobaina.synclocalandremotedb.api.Syncer;
 import com.enzorobaina.synclocalandremotedb.model.CharacterViewModel;
 
 public class ListCharacterActivity extends AppCompatActivity {
@@ -33,6 +34,8 @@ public class ListCharacterActivity extends AppCompatActivity {
         characterViewModel = new ViewModelProvider(this).get(CharacterViewModel.class);
 
         characterViewModel.getAllCharacters().observe(this, characters -> adapter.setCharacters(characters));
+
+        Syncer.getInstance(this.getApplication()).fetchAndInsert();
     }
 
     public void addCharacter(View view) {
