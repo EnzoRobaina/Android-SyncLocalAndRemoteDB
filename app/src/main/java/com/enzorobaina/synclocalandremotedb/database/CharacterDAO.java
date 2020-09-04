@@ -22,6 +22,9 @@ public interface CharacterDAO {
     @Update
     int update(Character character);
 
+    @Query("UPDATE " + Character.tableName + " SET isSynced = :syncStatus WHERE id = :id")
+    int updateSync(long id, int syncStatus);
+
     @Query("SELECT * FROM " + Character.tableName + " ORDER BY id ASC")
     public List<Character> getAllCharacters();
 
