@@ -6,8 +6,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.enzorobaina.synclocalandremotedb.api.IntCallback;
-import com.enzorobaina.synclocalandremotedb.api.LongCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.IntCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.LongCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback1;
 import com.enzorobaina.synclocalandremotedb.repository.CharacterRepository;
 
 import java.util.List;
@@ -32,11 +33,11 @@ public class CharacterViewModel extends AndroidViewModel {
         return allUnsyncedCharacters;
     }
 
-    public void insert(Character character, LongCallback callback){
+    public void insert(Character character, VoidCallback1 callback){
         characterRepository.insert(character, callback);
     }
 
-    public void update(Character character, IntCallback callback){
+    public void update(Character character, VoidCallback1 callback){
         characterRepository.update(character, callback);
     }
 }
