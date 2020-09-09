@@ -23,8 +23,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.enzorobaina.synclocalandremotedb.utils.ViewUtils.fieldsAreOk;
+
 public class CreateCharacterActivity extends AppCompatActivity {
-    ContentHelper contentHelper;
     EditText nameEditText;
     EditText strengthEditText;
     EditText dexterityEditText;
@@ -52,7 +53,6 @@ public class CreateCharacterActivity extends AppCompatActivity {
         wisdomEditText = findViewById(R.id.wisdomEditText);
         charismaEditText = findViewById(R.id.charismaEditText);
         submit = findViewById(R.id.btnSubmit);
-        contentHelper = ContentHelper.getInstance(this);
         spinner = findViewById(R.id.spinnerOverlay);
         characterViewModel = new ViewModelProvider(this).get(CharacterViewModel.class);
     }
@@ -64,44 +64,6 @@ public class CreateCharacterActivity extends AppCompatActivity {
 
     private void hideSpinner(){
         ViewUtils.animateView(spinner, View.GONE, 0, 200);
-    }
-
-    private boolean fieldsAreOk(){
-        List<EditText> fields = Arrays.asList(nameEditText, strengthEditText, dexterityEditText, constitutionEditText, intelligenceEditText, wisdomEditText, charismaEditText);
-        HashMap<String, String> fieldErrors = new HashMap<String, String>(){
-            {
-                put("empty", "Este campo não pode estar vazio");
-                put("invalid", "Este valor é inválido");
-                put("invalid-numeric", "Este valor precisa estar entre 1 e 20");
-            }
-        };
-        boolean isOk = true;
-        EditText toBeFocused = null;
-
-        for (EditText field : fields){
-            field.setError(null);
-            if (ViewUtils.getString(field).isEmpty()){
-                field.setError(fieldErrors.get("empty"));
-                isOk = false;
-                if (toBeFocused == null){
-                    toBeFocused = field;
-                }
-            }
-            if (field.getInputType() == InputType.TYPE_CLASS_NUMBER){
-                int intValue = ViewUtils.getInt(field);
-                if (intValue < 1 || intValue > 20){
-                    field.setError(fieldErrors.get("invalid-numeric"));
-                    isOk = false;
-                    if (toBeFocused == null){
-                        toBeFocused = field;
-                    }
-                }
-            }
-        }
-        if (toBeFocused != null){
-            toBeFocused.requestFocus();
-        }
-        return isOk;
     }
 
     private void disableSubmitBtn(){
@@ -119,7 +81,7 @@ public class CreateCharacterActivity extends AppCompatActivity {
     }
 
     public void onSubmit(View view){
-        if (!fieldsAreOk()){
+        if (!fieldsAreOk(Arrays.asList(nameEditText, strengthEditText, dexterityEditText, constitutionEditText, intelligenceEditText, wisdomEditText, charismaEditText))){
             return;
         }
 
