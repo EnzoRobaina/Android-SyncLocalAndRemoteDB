@@ -2,20 +2,33 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/listCharacterConstraint"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     tools:context=".activity.ListCharacterActivity">
 
-    <include
-        android:id="@+id/spinnerOverlay"
-        layout="@layout/include_spinner_overlay"
-        android:layout_width="125dp"
-        android:layout_height="125dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listCharacterRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/syncCharactersFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:clickable="true"
+        android:onClick="syncFabOnClick"
+        app:layout_constraintBottom_toTopOf="@+id/addCharacterFab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_rotate" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addCharacterFab"
@@ -30,22 +43,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_add" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/syncCharactersFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/addCharacterFab"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_rotate" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/listCharacterRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <include
+        android:id="@+id/spinnerOverlay"
+        layout="@layout/include_spinner_overlay"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
