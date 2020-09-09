@@ -12,7 +12,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.enzorobaina.synclocalandremotedb.R;
-import com.enzorobaina.synclocalandremotedb.api.LongCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.LongCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback1;
 import com.enzorobaina.synclocalandremotedb.database.ContentHelper;
 import com.enzorobaina.synclocalandremotedb.model.Character;
 import com.enzorobaina.synclocalandremotedb.model.CharacterViewModel;
@@ -134,23 +135,7 @@ public class CreateCharacterActivity extends AppCompatActivity {
         character.setWisdom(ViewUtils.getInt(wisdomEditText));
         character.setCharisma(ViewUtils.getInt(charismaEditText));
 
-        characterViewModel.insert(character, new LongCallback() {
-            @Override
-            public void onSuccess(long value) {
-                runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), String.valueOf(value), Toast.LENGTH_LONG).show();
-                    finish();
-                });
-            }
-
-            @Override
-            public void onFail() {
-                runOnUiThread(() -> {
-                    hideSpinner();
-                    enableSubmitBtn();
-                });
-            }
-        });
+        characterViewModel.insert(character, () -> runOnUiThread(this::finish));
     }
 
     private void startListActivity(){
