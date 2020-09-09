@@ -9,10 +9,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+
 import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.adapter.CharacterViewModelAdapter;
 import com.enzorobaina.synclocalandremotedb.api.Syncer;
+import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback1;
 import com.enzorobaina.synclocalandremotedb.model.CharacterViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 public class ListCharacterActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -34,11 +38,14 @@ public class ListCharacterActivity extends AppCompatActivity {
         characterViewModel = new ViewModelProvider(this).get(CharacterViewModel.class);
 
         characterViewModel.getAllCharacters().observe(this, characters -> adapter.setCharacters(characters));
-
-        Syncer.getInstance(this.getApplication()).fetchAndInsert();
     }
 
     public void addCharacter(View view) {
         startActivity(new Intent(this, CreateCharacterActivity.class));
+    }
+
+    public void syncFabOnClick(View view){
+        final Syncer syncer = Syncer.getInstance(this.getApplication());
+        syncer.syncLocalFromRemote(() -> syncer.syncRemoteFromLocal(() -> runOnUiThread(() -> Snackbar.make(findViewById(android.R.id.content), "Done Syncing!", Snackbar.LENGTH_LONG).show())));
     }
 }
