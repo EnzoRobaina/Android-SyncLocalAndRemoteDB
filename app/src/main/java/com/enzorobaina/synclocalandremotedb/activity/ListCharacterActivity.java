@@ -13,10 +13,13 @@ import android.widget.LinearLayout;
 import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.adapter.CharacterViewModelAdapter;
 import com.enzorobaina.synclocalandremotedb.api.Syncer;
+import com.enzorobaina.synclocalandremotedb.model.Character;
 import com.enzorobaina.synclocalandremotedb.model.CharacterViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
-public class ListCharacterActivity extends AppCompatActivity {
+import java.util.Objects;
+
+public class ListCharacterActivity extends AppCompatActivity implements CharacterViewModelAdapter.OnCharacterListener {
     private RecyclerView recyclerView;
     private CharacterViewModelAdapter adapter;
     private CharacterViewModel characterViewModel;
@@ -26,7 +29,7 @@ public class ListCharacterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_character2);
         recyclerView = findViewById(R.id.listCharacterRecyclerView);
-        adapter = new CharacterViewModelAdapter();
+        adapter = new CharacterViewModelAdapter(this);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
@@ -45,5 +48,13 @@ public class ListCharacterActivity extends AppCompatActivity {
     public void syncFabOnClick(View view){
         final Syncer syncer = Syncer.getInstance(this.getApplication());
         syncer.syncLocalFromRemote(() -> syncer.syncRemoteFromLocal(() -> runOnUiThread(() -> Snackbar.make(findViewById(android.R.id.content), "Done Syncing!", Snackbar.LENGTH_LONG).show())));
+    }
+
+    @Override
+    public void onCharacterClick(int position) {
+        Character instanceToSend = Objects.requireNonNull(characterViewModel.getAllCharacters().getValue()).get(position);
+        Intent intent = new Intent(this, UpdateCharacterActivity.class);
+        intent.putExtra("character", instanceToSend);
+        startActivity(intent);
     }
 }

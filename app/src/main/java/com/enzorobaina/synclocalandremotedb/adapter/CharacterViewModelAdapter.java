@@ -14,31 +14,44 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class CharacterViewModelAdapter extends RecyclerView.Adapter<CharacterViewModelAdapter.CharacterViewHolder>{
-    class CharacterViewHolder extends RecyclerView.ViewHolder {
+
+    class CharacterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView nameTextView;
         TextView idTextView;
         ImageView isSyncedImageView;
         TextView uuidTextView;
         TextView lastModifiedAtTextView;
+        OnCharacterListener onCharacterListener;
 
-        CharacterViewHolder(@NonNull View itemView) {
+        CharacterViewHolder(@NonNull View itemView, OnCharacterListener onCharacterListener) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.nameTextView);
             idTextView = itemView.findViewById(R.id.idTextView);
             isSyncedImageView = itemView.findViewById(R.id.isSyncedImageView);
             uuidTextView = itemView.findViewById(R.id.uuidTextView);
             lastModifiedAtTextView = itemView.findViewById(R.id.lastModifiedAtTextView);
+            this.onCharacterListener = onCharacterListener;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            onCharacterListener.onCharacterClick(getAdapterPosition());
         }
     }
 
-    private List<Character> characters;
+    public interface OnCharacterListener {
+        void onCharacterClick(int position);
+    }
 
-    public CharacterViewModelAdapter() {}
+    private List<Character> characters;
+    private OnCharacterListener onCharacterListener;
+    public CharacterViewModelAdapter(OnCharacterListener onCharacterListener) { this.onCharacterListener = onCharacterListener; }
 
     @NonNull
     @Override
     public CharacterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new CharacterViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_character, parent, false));
+        return new CharacterViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_character, parent, false), onCharacterListener);
     }
 
     @SuppressLint({"SimpleDateFormat", "SetTextI18n"})
