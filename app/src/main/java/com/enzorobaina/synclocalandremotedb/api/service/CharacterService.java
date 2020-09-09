@@ -1,6 +1,7 @@
 package com.enzorobaina.synclocalandremotedb.api.service;
 
 import com.enzorobaina.synclocalandremotedb.model.Character;
+import com.enzorobaina.synclocalandremotedb.model.PerformSyncResponse;
 
 import java.util.List;
 
@@ -27,5 +28,11 @@ public interface CharacterService {
     Call<Response<ResponseBody>> createMultipleCharacters(@Body List<Character> characters);
 
     @POST("characters/")
+    Call<List<Character>> createMultipleCharactersAndGetResult(@Body List<Character> characters);
+
+    @POST("characters/")
     Observable<Response<ResponseBody>> createCharacterWithObservable(@Body Character character);
+
+    @POST("perform-sync/")
+    Call<PerformSyncResponse> performSync(@Body List<Character> characters);
 }
