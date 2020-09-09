@@ -1,4 +1,4 @@
-package com.enzorobaina.synclocalandremotedb.api;
+package com.enzorobaina.synclocalandremotedb.callbacks;
 
 public interface IntCallback {
     void onSuccess(int value);
