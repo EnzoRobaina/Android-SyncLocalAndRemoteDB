@@ -6,14 +6,12 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
-
 import com.enzorobaina.synclocalandremotedb.model.Character;
-
 import java.util.List;
 
 @Dao
 public interface CharacterDAO {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(Character character);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -24,6 +22,12 @@ public interface CharacterDAO {
 
     @Query("UPDATE " + Character.tableName + " SET isSynced = :syncStatus WHERE id = :id")
     int updateSync(long id, int syncStatus);
+
+    @Query("UPDATE " + Character.tableName + " SET isSynced = 1, name = :name, lastModifiedAt = :lastModifiedAt, strength = :strength, dexterity = :dexterity, constitution = :constitution, intelligence = :intelligence, wisdom = :wisdom, charisma = :charisma WHERE uuid = :uuid")
+    int updateByUUID(String uuid, String name, String lastModifiedAt, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma);
+
+    @Update
+    int batchSetUUIDs(List<Character> characters);
 
     @Query("SELECT * FROM " + Character.tableName + " ORDER BY id ASC")
     public List<Character> getAllCharacters();
