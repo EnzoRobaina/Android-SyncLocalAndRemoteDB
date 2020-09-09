@@ -1,16 +1,15 @@
 package com.enzorobaina.synclocalandremotedb.repository;
 
 import android.app.Application;
-
 import androidx.lifecycle.LiveData;
-
-import com.enzorobaina.synclocalandremotedb.api.IntCallback;
-import com.enzorobaina.synclocalandremotedb.api.ListCallback;
-import com.enzorobaina.synclocalandremotedb.api.LongCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.CharacterListCallback;
+import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback1;
+import com.enzorobaina.synclocalandremotedb.converters.DateConverter;
 import com.enzorobaina.synclocalandremotedb.database.CharacterDAO;
 import com.enzorobaina.synclocalandremotedb.database.CharacterRoomDatabase;
 import com.enzorobaina.synclocalandremotedb.model.Character;
-
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CharacterRepository {
@@ -33,6 +32,23 @@ public class CharacterRepository {
         allUnsyncedCharactersLiveData = characterDAO.getAllCharactersLiveDataWithSync(Character.UNSYNCED);
     }
 
+    private void setCreatedAt(Character character, Date now){
+        if (character.getCreatedAt() == null){
+            character.setCreatedAt(now);
+        }
+    }
+
+    private void setModifiedAt(Character character, Date now){
+        if (character.getLastModifiedAt() == null){
+            character.setLastModifiedAt(now);
+        }
+    }
+
+    private void setCreatedAndModifiedAt(Character character, Date now){
+        setCreatedAt(character, now);
+        setModifiedAt(character, now);
+    }
+
     public LiveData<List<Character>> getAllCharactersLiveData(){
         return allCharactersLiveData;
     }
@@ -41,59 +57,122 @@ public class CharacterRepository {
         return allUnsyncedCharactersLiveData;
     }
 
-    public List<Character> getAllCharacters(){
-        return characterDAO.getAllCharacters();
+    public void getAllCharacters(CharacterListCallback callback){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            callback.onSuccess(characterDAO.getAllCharacters());
+        });
     }
 
-    public List<Character> getAllUnsyncedCharacters(){
-        return characterDAO.getAllCharactersWithSync(Character.UNSYNCED);
+    public void getAllCharactersWithStatus(CharacterListCallback callback, int syncStatus){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            callback.onSuccess(characterDAO.getAllCharactersWithSync(syncStatus));
+        });
     }
 
-    public void insert(Character character, LongCallback callback) {
+    public void batchUpdateByUUID(List<Character> characters, VoidCallback1 callback){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            // String uuid, Date lastModifiedAt, String name, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma
+            for (Character character : characters){
+                characterDAO.updateByUUID(
+                    character.getUuid(),
+                    character.getName(),
+                    DateConverter.fromDate(character.getLastModifiedAt()),
+                    character.getStrength(),
+                    character.getDexterity(),
+                    character.getConstitution(),
+                    character.getIntelligence(),
+                    character.getWisdom(),
+                    character.getCharisma()
+                );
+            }
+        callback.done();
+        });
+    }
+
+    public void insert(Character character, VoidCallback1 callback) {
+        Date now = Calendar.getInstance().getTime();
+        setCreatedAndModifiedAt(character, now);
+
         CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
             long value = characterDAO.insert(character);
-            if (value > 0){
-                callback.onSuccess(value);
-            }
-            else {
-                callback.onFail();
-            }
+            callback.done();
         });
     }
 
-    public void update(Character character, IntCallback callback){
+    public void insert(Character character) {
+        Date now = Calendar.getInstance().getTime();
+        setCreatedAndModifiedAt(character, now);
+
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            characterDAO.insert(character);
+        });
+    }
+
+    public void batchUpdateUUIDs(List<Character> characters, VoidCallback1 callback){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            int affectedRows = characterDAO.batchSetUUIDs(characters);
+            callback.done();
+        });
+    }
+
+    public void batchUpdateUUIDs(List<Character> characters){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            characterDAO.batchSetUUIDs(characters);
+        });
+    }
+
+    public void update(Character character, VoidCallback1 callback){
+        Date now = Calendar.getInstance().getTime();
+        setModifiedAt(character, now);
         CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
             int value = characterDAO.update(character);
-            if (value > 0){
-                callback.onSuccess(value);
-            }
-            else {
-                callback.onFail();
-            }
+            callback.done();
         });
     }
 
-    public void updateSync(long id, int syncStatus, IntCallback callback){
+    public void update(Character character){
+        Date now = Calendar.getInstance().getTime();
+        setModifiedAt(character, now);
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            characterDAO.update(character);
+        });
+    }
+
+    public void updateSync(long id, int syncStatus, VoidCallback1 callback){
         CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
             int value = characterDAO.updateSync(id, syncStatus);
-            if (value > 0){
-                callback.onSuccess(value);
-            }
-            else {
-                callback.onFail();
-            }
+            callback.done();
         });
     }
 
-    public void insertMultiple(List<Character> characters, ListCallback callback){
+    public void updateSync(long id, int syncStatus){
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            characterDAO.updateSync(id, syncStatus);
+        });
+    }
+
+    public void insertMultiple(List<Character> characters, VoidCallback1 callback){
+        Date now = Calendar.getInstance().getTime();
+        for (Character character : characters){
+            setCreatedAndModifiedAt(character, now);
+            character.setSynced(Character.SYNCED);
+        } // Todo: Refator me!
+
         CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
             List<Long> values = characterDAO.insertMultiple(characters);
-            if (values != null && values.size() > 0){
-                callback.onSuccess(values);
-            }
-            else {
-                callback.onFail();
-            }
+            callback.done();
+        });
+    }
+
+    public void insertMultiple(List<Character> characters){
+        Date now = Calendar.getInstance().getTime();
+        for (Character character : characters){
+            setCreatedAndModifiedAt(character, now);
+            character.setSynced(Character.SYNCED);
+        } // Todo: Refator me!
+
+        CharacterRoomDatabase.databaseWriteExecutor.execute(() -> {
+            characterDAO.insertMultiple(characters);
         });
     }
 }
