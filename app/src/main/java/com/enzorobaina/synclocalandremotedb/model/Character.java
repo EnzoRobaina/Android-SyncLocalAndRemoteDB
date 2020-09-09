@@ -1,5 +1,8 @@
 package com.enzorobaina.synclocalandremotedb.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
@@ -25,7 +28,7 @@ import java.util.Locale;
 */
 
 @Entity(tableName = Character.tableName)
-public class Character {
+public class Character implements Parcelable {
     public static final String tableName = "character";
     public static final int UNSYNCED = 0;
     public static final int SYNCED = 1;
@@ -260,4 +263,55 @@ public class Character {
     public void setLastModifiedAt(Date lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
     }
+
+    protected Character(Parcel in) {
+        uuid = in.readString();
+        id = in.readLong();
+        name = in.readString();
+        strength = in.readInt();
+        dexterity = in.readInt();
+        constitution = in.readInt();
+        intelligence = in.readInt();
+        wisdom = in.readInt();
+        charisma = in.readInt();
+        isSynced = in.readByte() != 0x00;
+        long tmpCreatedAt = in.readLong();
+        createdAt = tmpCreatedAt != -1 ? new Date(tmpCreatedAt) : null;
+        long tmpLastModifiedAt = in.readLong();
+        lastModifiedAt = tmpLastModifiedAt != -1 ? new Date(tmpLastModifiedAt) : null;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uuid);
+        dest.writeLong(id);
+        dest.writeString(name);
+        dest.writeInt(strength);
+        dest.writeInt(dexterity);
+        dest.writeInt(constitution);
+        dest.writeInt(intelligence);
+        dest.writeInt(wisdom);
+        dest.writeInt(charisma);
+        dest.writeByte((byte) (isSynced ? 0x01 : 0x00));
+        dest.writeLong(createdAt != null ? createdAt.getTime() : -1L);
+        dest.writeLong(lastModifiedAt != null ? lastModifiedAt.getTime() : -1L);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Character> CREATOR = new Parcelable.Creator<Character>() {
+        @Override
+        public Character createFromParcel(Parcel in) {
+            return new Character(in);
+        }
+
+        @Override
+        public Character[] newArray(int size) {
+            return new Character[size];
+        }
+    };
 }
