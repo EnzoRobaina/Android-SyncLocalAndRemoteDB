@@ -1,32 +1,19 @@
 package com.enzorobaina.synclocalandremotedb.api;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 import com.enzorobaina.synclocalandremotedb.api.service.CharacterService;
-import com.enzorobaina.synclocalandremotedb.database.ContentHelper;
-import com.enzorobaina.synclocalandremotedb.database.DatabaseHelper;
+import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback1;
 import com.enzorobaina.synclocalandremotedb.model.Character;
+import com.enzorobaina.synclocalandremotedb.model.PerformSyncResponse;
 import com.enzorobaina.synclocalandremotedb.repository.CharacterRepository;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Syncer {
     private static Syncer instance = null;
-    private ContentHelper contentHelper;
-    private DatabaseHelper databaseHelper;
     private CharacterService characterService;
     private CharacterRepository repository;
 
@@ -42,149 +29,64 @@ public class Syncer {
         this.repository = CharacterRepository.getInstance(application);
     }
 
-    public void fetchAndInsert(){
-        Call<List<Character>> call = characterService.getCharacters();
-        call.enqueue(new Callback<List<Character>>() {
-            @Override
-            public void onResponse(Call<List<Character>> call, Response<List<Character>> response) {
-                Log.d("fetchAndIns", response.body().toString());
-                List<Character> responseList = response.body();
-                repository.insertMultiple(responseList, new ListCallback() {
-                    @Override
-                    public void onSuccess(List<Long> value) {
-                        for (Long id : value){
-                            repository.updateSync(id, Character.SYNCED, new IntCallback() {
-                                @Override
-                                public void onSuccess(int value) {
-                                    Log.d("updateSync", "for " + value);
-                                }
+    public void syncLocalFromRemote(VoidCallback1 voidCallback){
+        Log.d("syncLocalFromRemote", "starting syncLocalFromRemote");
+        repository.getAllCharactersWithStatus(characters -> {
+            Call<PerformSyncResponse> call = characterService.performSync(characters);
 
-                                @Override
-                                public void onFail() {
+            call.enqueue(new Callback<PerformSyncResponse>() {
+                @Override
+                public void onResponse(Call<PerformSyncResponse> call, Response<PerformSyncResponse> response) {
+                    if (response.body() == null){ return; }
 
-                                    Log.d("updateSync", "failed for " + value);
-                                }
-                            });
-                        }
-                    }
+                    Log.d("performSyncRes", "\nto insert >>>>>\n" + response.body().toInsert.toString());
+                    Log.d("performSyncRes", "\nto update >>>>>\n" + response.body().toUpdate.toString());
 
-                    @Override
-                    public void onFail() {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Call<List<Character>> call, Throwable t) {
-
-            }
-        });
+                    repository.insertMultiple(response.body().toInsert, () -> {
+                        repository.batchUpdateByUUID(response.body().toUpdate, () -> {
+                            Log.d("batchByUuid", "Done updating by uuids");
+                            voidCallback.done(); // Entire process has been successful.
+                        });
+                    });
+                }
+                @Override
+                public void onFailure(Call<PerformSyncResponse> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+        }, Character.SYNCED);
     }
 
-    public void syncRemoteWithLocal(VoidCallback voidCallback){
-        CharacterService characterRxService = RetrofitConfig.getInstance().getCharacterRxService();
-        List<Character> unsyncedCharacters = contentHelper.getAllCharactersWithSync(false);
+    public void syncRemoteFromLocal(VoidCallback1 voidCallback){
+        Log.d("syncRemoteFromLocal", "starting syncRemoteFromLocal");
+        repository.getAllCharactersWithStatus(unsyncedLocalCharacters -> {
+            Call<List<Character>> call = characterService.createMultipleCharactersAndGetResult(unsyncedLocalCharacters);
+            call.enqueue(new Callback<List<Character>>() {
+                 @Override
+                 public void onResponse(Call<List<Character>> call, Response<List<Character>> response) {
+                       if (response.body() == null){ return; }
+                             List<Character> returnedCharacters = response.body();
 
-        Log.d("syncRemoteWithLocal", String.format("%s chars are unsynced", unsyncedCharacters.size()));
+                             if ((returnedCharacters.size() > 0 && unsyncedLocalCharacters.size() > 0)){
 
-        List<Observable<Response<ResponseBody>>> tasks = new ArrayList<>();
-        for (Character c : unsyncedCharacters){
-            tasks.add(
-                characterRxService.createCharacterWithObservable(c)
-                .doOnNext(response -> {
-                    Log.d("doOnNext", response.toString());
-                    if (response.isSuccessful()){
-                        boolean gotSynced = contentHelper.updateSync(c.getId(), true);
-                        Log.d("gotSynced", gotSynced + "");
-                    }
-                })
+                                 for (int i = 0; i < unsyncedLocalCharacters.size(); i++){
+                                     Character local = unsyncedLocalCharacters.get(i);
+                                     Character returned = returnedCharacters.get(i);
+
+                                     local.setUuid(returned.getUuid());
+                                     local.setSynced(Character.SYNCED);
+                                 }
+
+                                 repository.batchUpdateUUIDs(unsyncedLocalCharacters, voidCallback::done);
+                             }
+                             else {
+                                 Log.d("syncRemoteFromLocal", "nothing to send to remote!");
+                                 voidCallback.done();
+                             }
+                 }
+                 @Override public void onFailure(Call<List<Character>> call, Throwable t) { t.printStackTrace(); }
+                }
             );
-        }
-
-        Observable.concat(tasks)
-        .subscribeOn(Schedulers.computation())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<Response<ResponseBody>>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
-            @Override
-            public void onNext(@NonNull Response<ResponseBody> responseBodyResponse) {}
-            @Override
-            public void onError(@NonNull Throwable e) { e.printStackTrace(); voidCallback.onFail(); voidCallback.always(); }
-            @Override
-            public void onComplete() { Log.d("concat", "completed"); voidCallback.onSuccess(); voidCallback.always(); }
-        });
-    }
-
-    public void runFirst(VoidCallback voidCallback){
-        if (databaseHelper.isCharacterDatabaseEmpty()){
-            this.syncLocalWithRemote(voidCallback);
-        }
-        else { voidCallback.always(); }
-    }
-
-    public void syncLocalWithRemote(VoidCallback voidCallback){
-        Call<List<Character>> call = characterService.getCharacters();
-        call.enqueue(new Callback<List<Character>>() {
-            @Override
-            public void onResponse(Call<List<Character>> call, Response<List<Character>> response) {
-                List<Character> characterList = response.body();
-                for (Character character : characterList){
-                    character.setSynced(true); // TODO: Deserialize and set synced to true automatically
-                    contentHelper.createCharacter(character);
-                }
-                voidCallback.onSuccess();
-                voidCallback.always();
-            }
-
-            @Override
-            public void onFailure(Call<List<Character>> call, Throwable t) {
-                t.printStackTrace();
-                voidCallback.onFail();
-                voidCallback.always();
-            }
-        });
-
-    }
-
-    public void syncOne(Character character){
-        Call<Character> call = characterService.createCharacter(character);
-        call.enqueue(new Callback<Character>() {
-            @Override
-            public void onResponse(Call<Character> call, Response<Character> response) {}
-            @Override
-            public void onFailure(Call<Character> call, Throwable t) {}
-        });
-    }
-
-    public void syncOne(Character character, VoidCallback voidCallback){
-        Call<Character> call = characterService.createCharacter(character);
-        call.enqueue(new Callback<Character>() {
-            @Override
-            public void onResponse(Call<Character> call, Response<Character> response) {
-
-                Log.d("syncOne", response.toString());
-
-                if (response.isSuccessful()){
-                    contentHelper.updateSync(character.getId(), true);
-                    voidCallback.onSuccess();
-                }
-                else {
-                    try { Log.d("syncOne",  response.errorBody().string()); }
-                    catch (IOException e) { e.printStackTrace(); }
-
-                    voidCallback.onFail();
-                }
-                voidCallback.always();
-            }
-
-            @Override
-            public void onFailure(Call<Character> call, Throwable t) {
-                t.printStackTrace();
-                voidCallback.onFail();
-                voidCallback.always();
-            }
-        });
+        }, Character.UNSYNCED);
     }
 }
