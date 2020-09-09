@@ -33,20 +33,20 @@ public class CharacterRepository {
     }
 
     private void setCreatedAt(Character character, Date now){
-        if (character.getCreatedAt() == null){
-            character.setCreatedAt(now);
-        }
+        character.setCreatedAt(now);
     }
 
     private void setModifiedAt(Character character, Date now){
-        if (character.getLastModifiedAt() == null){
-            character.setLastModifiedAt(now);
-        }
+        character.setLastModifiedAt(now);
     }
 
     private void setCreatedAndModifiedAt(Character character, Date now){
-        setCreatedAt(character, now);
-        setModifiedAt(character, now);
+        if (character.getCreatedAt() == null){
+            setCreatedAt(character, now);
+        }
+        if (character.getLastModifiedAt() == null){
+            setModifiedAt(character, now);
+        }
     }
 
     public LiveData<List<Character>> getAllCharactersLiveData(){
