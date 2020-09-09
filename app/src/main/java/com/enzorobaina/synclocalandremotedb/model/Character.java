@@ -205,8 +205,9 @@ public class Character {
     public String toString(){
         return String.format(
                 Locale.ENGLISH,
-                "ID: %d, Name: %s, Sync: %s, C_At: %s, M_At: %s, St: %d, Dex: %d, Const: %d, Intel: %d, Wisd: %d, Char: %d",
+                "ID: %d, UUID: %s, Name: %s, Sync: %s, C_At: %s, M_At: %s, St: %d, Dex: %d, Const: %d, Intel: %d, Wisd: %d, Char: %d",
                 this.id,
+                (this.uuid.isEmpty() ? "TBD" : this.uuid),
                 this.name,
                 this.isSynced,
                 this.createdAt.toString(),
