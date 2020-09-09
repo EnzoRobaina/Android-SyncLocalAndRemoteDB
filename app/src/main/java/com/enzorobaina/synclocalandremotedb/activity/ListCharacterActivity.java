@@ -13,8 +13,6 @@ import android.widget.LinearLayout;
 import com.enzorobaina.synclocalandremotedb.R;
 import com.enzorobaina.synclocalandremotedb.adapter.CharacterViewModelAdapter;
 import com.enzorobaina.synclocalandremotedb.api.Syncer;
-import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback;
-import com.enzorobaina.synclocalandremotedb.callbacks.VoidCallback1;
 import com.enzorobaina.synclocalandremotedb.model.CharacterViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -28,7 +26,7 @@ public class ListCharacterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_character2);
         recyclerView = findViewById(R.id.listCharacterRecyclerView);
-        adapter = new CharacterViewModelAdapter(this);
+        adapter = new CharacterViewModelAdapter();
 
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
